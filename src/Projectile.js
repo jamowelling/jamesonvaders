@@ -1,15 +1,16 @@
 import React, { Component } from 'react';
 import {
   View,
-  Animated,
 } from 'react-native';
 
 class Projectile extends Component {
+  componentDidMount() {
+    this.props.launchProjectile();
+  }
+
   render() {
     return (
-      <Animated.View>
-        <View style={styles.projectileStyle} />
-      </Animated.View>
+      <View style={styles.projectileStyle} />
     );
   }
 }

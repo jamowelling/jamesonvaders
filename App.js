@@ -1,18 +1,74 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
-  View
+  View,
+  Animated,
+  Dimensions,
 } from 'react-native';
 
 import Vessel from './src/Vessel';
 import Projectile from './src/Projectile';
 
+const SCREEN_HEIGHT = Dimensions.get('window').height;
+
 export default class App extends Component<{}> {
+  constructor(props) {
+    super(props);
+    this.state = {
+      vesselLocation: {
+        x: 0,
+        y: 0,
+      },
+      projectiles: [],
+    }
+  }
+
+  cleanUpProjectiles() {
+    this.state.projectiles.forEach(value => {
+      // console.log('projectile: ', value);
+    })
+  }
+
+  componentDidMount() {
+    setInterval(() => {
+      const projectiles = [
+        ...this.state.projectiles,
+        {
+          id: Math.random(),
+          valueXY: new Animated.ValueXY(this.state.vesselLocation)
+        }
+      ];
+      this.setState({ projectiles });
+      this.cleanUpProjectiles();
+    }, 2000)
+  }
+
+  launchProjectile = (index) => {
+    const valueXY = this.state.projectiles[index].valueXY;
+    Animated.timing(valueXY.y, {
+      toValue: -500,
+      duration: 1000,
+    }).start();
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Vessel />
-        <Projectile />
+        <Vessel vesselLocation={(vesselLocation) => this.setState({ vesselLocation })}/>
+        {
+          this.state.projectiles.map((value, index) => {
+            return (
+              <Animated.View
+                key={value.id}
+                style={[value.valueXY.getLayout(), { position: 'absolute' }]}
+              >
+                <Projectile
+                  launchProjectile={() => this.launchProjectile(index)}
+                />
+              </Animated.View>
+            );
+          })
+        }
       </View>
     );
   }

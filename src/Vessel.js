@@ -14,8 +14,8 @@ class Vessel extends Component {
     const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (event, gesture) => {
-        console.log('hit');
         const { moveX, moveY } = gesture;
+        props.vesselLocation({ x: moveX - 5, y: moveY - 10 }); //eslint-disable-line
         position.setValue({ x: moveX - 30, y: moveY - 30});
       }
     });
@@ -27,7 +27,7 @@ class Vessel extends Component {
   render() {
     return (
       <Animated.View
-        style={this.position.getLayout()}
+        style={[this.position.getLayout(), styles.vesselContainer]}
         {...this.panResponder.panHandlers}
       >
         <View style={styles.vesselStyle} />
