@@ -4,6 +4,7 @@ import {
   View,
   Animated,
   Dimensions,
+  Easing,
 } from 'react-native';
 
 import Vessel from './src/Vessel';
@@ -40,15 +41,22 @@ export default class App extends Component<{}> {
       ];
       this.setState({ projectiles });
       this.cleanUpProjectiles();
-    }, 2000)
+    }, 200)
   }
 
   launchProjectile = (index) => {
     const valueXY = this.state.projectiles[index].valueXY;
     Animated.timing(valueXY.y, {
       toValue: -500,
-      duration: 1000,
-    }).start();
+      duration: 500,
+      easing: Easing.linear(),
+    }).start(() => {
+      const projectiles = [...this.state.projectiles.slice(1)];
+      this.setState({
+        projectiles,
+      });
+
+    });
   }
 
   render() {
