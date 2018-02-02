@@ -7,6 +7,7 @@ import {
   Easing,
 } from 'react-native';
 
+import Bogey from './src/Bogey';
 import Vessel from './src/Vessel';
 import Projectile from './src/Projectile';
 
@@ -24,12 +25,6 @@ export default class App extends Component<{}> {
     }
   }
 
-  cleanUpProjectiles() {
-    this.state.projectiles.forEach(value => {
-      // console.log('projectile: ', value);
-    })
-  }
-
   componentDidMount() {
     setInterval(() => {
       const projectiles = [
@@ -40,7 +35,6 @@ export default class App extends Component<{}> {
         }
       ];
       this.setState({ projectiles });
-      this.cleanUpProjectiles();
     }, 200)
   }
 
@@ -62,6 +56,7 @@ export default class App extends Component<{}> {
   render() {
     return (
       <View style={styles.container}>
+        <Bogey style={{ position: 'absolute' }}/>
         <Vessel vesselLocation={(vesselLocation) => this.setState({ vesselLocation })}/>
         {
           this.state.projectiles.map((value, index) => {
