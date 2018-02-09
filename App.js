@@ -2,11 +2,10 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Animated,
   Dimensions,
-  Easing,
 } from 'react-native';
 
+import Bogey from './src/Bogey';
 import Vessel from './src/Vessel';
 import Projectile from './src/Projectile';
 
@@ -24,56 +23,46 @@ export default class App extends Component<{}> {
     }
   }
 
-  cleanUpProjectiles() {
-    this.state.projectiles.forEach(value => {
-      // console.log('projectile: ', value);
-    })
-  }
-
   componentDidMount() {
+
+    function* idMaker() {
+      let index = 0;
+      while (index < index + 1)
+        yield index++;
+    }
+
+    const gen = idMaker();
+
     setInterval(() => {
       const projectiles = [
         ...this.state.projectiles,
         {
-          id: Math.random(),
-          valueXY: new Animated.ValueXY(this.state.vesselLocation)
+          id: gen.next().value,
+          genesis: this.state.vesselLocation,
         }
       ];
       this.setState({ projectiles });
-      this.cleanUpProjectiles();
-    }, 200)
+    }, 300)
   }
 
-  launchProjectile = (index) => {
-    const valueXY = this.state.projectiles[index].valueXY;
-    Animated.timing(valueXY.y, {
-      toValue: -500,
-      duration: 500,
-      easing: Easing.linear(),
-    }).start(() => {
-      const projectiles = [...this.state.projectiles.slice(1)];
-      this.setState({
-        projectiles,
-      });
-
-    });
+  finishedAnimation = (finished, id) => {
+    const projectiles = this.state.projectiles.filter(projectile => projectile.id !== id);
+    this.setState({ projectiles });
   }
 
   render() {
     return (
       <View style={styles.container}>
+        <Bogey style={{ position: 'absolute' }}/>
         <Vessel vesselLocation={(vesselLocation) => this.setState({ vesselLocation })}/>
         {
-          this.state.projectiles.map((value, index) => {
+          this.state.projectiles.map(value => {
             return (
-              <Animated.View
+              <Projectile
                 key={value.id}
-                style={[value.valueXY.getLayout(), { position: 'absolute' }]}
-              >
-                <Projectile
-                  launchProjectile={() => this.launchProjectile(index)}
-                />
-              </Animated.View>
+                data={value}
+                finishedAnimation={this.finishedAnimation}
+              />
             );
           })
         }
