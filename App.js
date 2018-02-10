@@ -3,14 +3,11 @@ import {
   StyleSheet,
   View,
   Animated,
-  Dimensions,
-  Easing,
 } from 'react-native';
 
 import Vessel from './src/Vessel';
 import Projectile from './src/Projectile';
 
-const SCREEN_HEIGHT = Dimensions.get('window').height;
 
 export default class App extends Component<{}> {
   constructor(props) {
@@ -24,32 +21,38 @@ export default class App extends Component<{}> {
     }
   }
 
-  cleanUpProjectiles() {
-    this.state.projectiles.forEach(value => {
-      // console.log('projectile: ', value);
-    })
-  }
-
   componentDidMount() {
+    const idMaker = (function* () {
+      let index = 0;
+      while (index < index + 1)
+        yield index++;
+    })();
+
     setInterval(() => {
       const projectiles = [
         ...this.state.projectiles,
         {
-          id: Math.random(),
+          id: idMaker.next().value,
           valueXY: new Animated.ValueXY(this.state.vesselLocation)
         }
       ];
       this.setState({ projectiles });
-      this.cleanUpProjectiles();
-    }, 200)
+    }, 1000)
   }
 
   launchProjectile = (index) => {
-    const valueXY = this.state.projectiles[index].valueXY;
-    Animated.timing(valueXY.y, {
+    const projectile = this.state.projectiles[index];
+    projectile._value = { x: 0, y: 0 };
+    projectile.valueXY.addListener(value => {
+      projectile._value = value;
+      if (projectile._value.y < 0) {
+        // test case, triggers when projectile has gone off screen
+      }
+    });
+
+    Animated.timing(projectile.valueXY.y, {
       toValue: -500,
       duration: 500,
-      easing: Easing.linear(),
     }).start(() => {
       const projectiles = [...this.state.projectiles.slice(1)];
       this.setState({
@@ -62,13 +65,12 @@ export default class App extends Component<{}> {
   render() {
     return (
       <View style={styles.container}>
-        <Vessel vesselLocation={(vesselLocation) => this.setState({ vesselLocation })}/>
         {
-          this.state.projectiles.map((value, index) => {
+          this.state.projectiles.map((projectile, index) => {
             return (
               <Animated.View
-                key={value.id}
-                style={[value.valueXY.getLayout(), { position: 'absolute' }]}
+                key={projectile.id}
+                style={[projectile.valueXY.getLayout(), { position: 'absolute' }]}
               >
                 <Projectile
                   launchProjectile={() => this.launchProjectile(index)}
@@ -77,6 +79,7 @@ export default class App extends Component<{}> {
             );
           })
         }
+        <Vessel vesselLocation={(vesselLocation) => this.setState({ vesselLocation })}/>
       </View>
     );
   }
