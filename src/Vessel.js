@@ -9,7 +9,7 @@ class Vessel extends Component {
   constructor(props) {
     super(props);
 
-    const position = new Animated.ValueXY();
+    const position = new Animated.ValueXY({ x: 187, y: 400 });
 
     const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: () => true,
@@ -22,7 +22,10 @@ class Vessel extends Component {
 
     this.panResponder = panResponder;
     this.position = position;
-
+  }
+  componentDidMount() {
+    this.props.vesselLocation({ x: 212, y: 420 });
+    this.position.setValue({ x: 187, y: 400 });
   }
   render() {
     return (

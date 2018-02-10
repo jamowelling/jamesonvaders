@@ -14,7 +14,6 @@ class Bogey extends Component {
 
 const styles = {
   bogeyStyle: {
-    position: 'absolute',
     width: 50,
     height: 50,
     backgroundColor: 'red',

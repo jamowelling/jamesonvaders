@@ -5,6 +5,7 @@ import {
   Animated,
 } from 'react-native';
 
+import Bogey from './src/Bogey';
 import Vessel from './src/Vessel';
 import Projectile from './src/Projectile';
 
@@ -14,10 +15,13 @@ export default class App extends Component<{}> {
     super(props);
     this.state = {
       vesselLocation: {
-        x: 0,
-        y: 0,
+        x: 187,
+        y: 400,
       },
       projectiles: [],
+      bogey: {
+        valueXY: new Animated.ValueXY({ x: 187, y: 1 }),
+      },
     }
   }
 
@@ -65,6 +69,9 @@ export default class App extends Component<{}> {
   render() {
     return (
       <View style={styles.container}>
+        <Animated.View style={[this.state.bogey.valueXY.getLayout(), { position: 'absolute' }]}>
+          <Bogey />
+        </Animated.View>
         {
           this.state.projectiles.map((projectile, index) => {
             return (
