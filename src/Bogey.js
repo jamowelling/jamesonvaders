@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
 import {
-  View,
   Animated,
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 class Bogey extends Component {
   render() {
     return (
-      <Animated.View style={styles.bogeyStyle} />
+      <Animated.View style={[styles.bogeyStyle, { backgroundColor: this.props.backgroundColor }]} />
     );
   }
 }
@@ -16,8 +16,11 @@ const styles = {
   bogeyStyle: {
     width: 50,
     height: 50,
-    backgroundColor: 'red',
   },
+};
+
+Bogey.propTypes = {
+  backgroundColor: PropTypes.string,
 };
 
 export default Bogey;

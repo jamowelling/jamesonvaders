@@ -21,8 +21,16 @@ export default class App extends Component<{}> {
       projectiles: [],
       bogey: {
         valueXY: new Animated.ValueXY({ x: 187, y: 1 }),
+        backgroundColor: 'blue',
       },
     }
+
+    this._bogeyValue = {
+      x: 187,
+      y: 1,
+    };
+
+    this.state.bogey.valueXY.addListener(value => this._bogeyValue = value);
   }
 
   componentDidMount() {
@@ -44,25 +52,31 @@ export default class App extends Component<{}> {
     }, 1000)
   }
 
+  finishedAnimation = (finished, id) => {
+    const projectiles = this.state.projectiles.filter(projectile => projectile.id !== id);
+    this.setState({ projectiles });
+  }
+
   launchProjectile = (index) => {
     const projectile = this.state.projectiles[index];
     projectile._value = { x: 0, y: 0 };
     projectile.valueXY.addListener(value => {
       projectile._value = value;
-      if (projectile._value.y < 0) {
-        // test case, triggers when projectile has gone off screen
+      if (Math.abs(projectile._value.y - this._bogeyValue.y) < 30 &&
+          Math.abs(projectile._value.x - this._bogeyValue.x) < 30) {
+            this.finishedAnimation(false, projectile.id);
+            this.setState({ bogey: {
+                ...this.state.bogey,
+                backgroundColor: '#000000'.replace(/0/g,function(){return (~~(Math.random()*16)).toString(16);}), //eslint-disable-line
+              }
+            });
       }
     });
-
     Animated.timing(projectile.valueXY.y, {
       toValue: -500,
       duration: 500,
-    }).start(() => {
-      const projectiles = [...this.state.projectiles.slice(1)];
-      this.setState({
-        projectiles,
-      });
-
+    }).start(finished => {
+      this.finishedAnimation(finished, projectile.id);
     });
   }
 
@@ -70,7 +84,7 @@ export default class App extends Component<{}> {
     return (
       <View style={styles.container}>
         <Animated.View style={[this.state.bogey.valueXY.getLayout(), { position: 'absolute' }]}>
-          <Bogey />
+          <Bogey backgroundColor={this.state.bogey.backgroundColor} />
         </Animated.View>
         {
           this.state.projectiles.map((projectile, index) => {
