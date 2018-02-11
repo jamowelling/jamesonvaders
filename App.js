@@ -20,13 +20,13 @@ export default class App extends Component<{}> {
       },
       projectiles: [],
       bogey: {
-        valueXY: new Animated.ValueXY({ x: 187, y: 1 }),
+        valueXY: new Animated.ValueXY({ x: 0, y: 1 }),
         backgroundColor: 'blue',
       },
     }
 
     this._bogeyValue = {
-      x: 187,
+      x: 0,
       y: 1,
     };
 
@@ -49,7 +49,26 @@ export default class App extends Component<{}> {
         }
       ];
       this.setState({ projectiles });
-    }, 1000)
+    }, 300);
+    this.moveBogeyRight();
+  }
+
+  moveBogeyRight = () => {
+    Animated.timing(this.state.bogey.valueXY.x, {
+      toValue: 361,
+      duration: 5000,
+    }).start(() => {
+      this.moveBogeyLeft();
+    });
+  }
+
+  moveBogeyLeft = () => {
+    Animated.timing(this.state.bogey.valueXY.x, {
+      toValue: 1,
+      duration: 5000,
+    }).start(() => {
+      this.moveBogeyRight();
+    });
   }
 
   finishedAnimation = (finished, id) => {
@@ -62,8 +81,8 @@ export default class App extends Component<{}> {
     projectile._value = { x: 0, y: 0 };
     projectile.valueXY.addListener(value => {
       projectile._value = value;
-      if (Math.abs(projectile._value.y - this._bogeyValue.y) < 30 &&
-          Math.abs(projectile._value.x - this._bogeyValue.x) < 30) {
+      if (Math.abs(projectile._value.y - this._bogeyValue.y) < 40 &&
+          Math.abs((projectile._value.x - 25) - this._bogeyValue.x) < 40) {
             this.finishedAnimation(false, projectile.id);
             this.setState({ bogey: {
                 ...this.state.bogey,
@@ -73,7 +92,7 @@ export default class App extends Component<{}> {
       }
     });
     Animated.timing(projectile.valueXY.y, {
-      toValue: -500,
+      toValue: -50,
       duration: 500,
     }).start(finished => {
       this.finishedAnimation(finished, projectile.id);
